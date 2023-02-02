@@ -1,0 +1,272 @@
+/* tslint:disable */
+
+import React, {
+    ButtonHTMLAttributes,
+    Key,
+    ReactElement,
+    useLayoutEffect,
+    useRef
+} from "react";
+import { AriaMenuProps, MenuTriggerProps } from "@react-types/menu";
+import { useMenuTriggerState } from "@react-stately/menu";
+import { useTreeState } from "@react-stately/tree";
+import { useButton } from "@react-aria/button";
+import { FocusScope, useFocusRing } from "@react-aria/focus";
+import { useMenu, useMenuItem, useMenuTrigger } from "@react-aria/menu";
+import { useOverlayPosition } from "@react-aria/overlays";
+import { mergeProps } from "@react-aria/utils";
+import { Popover } from "../Popover";
+import { useFocusableRef, useUnwrapDOMRef } from "@react-spectrum/utils";
+import { useToggleState } from '@react-stately/toggle';
+import {
+    FocusableRef,
+    FocusStrategy,
+    DOMRefValue,
+    Node
+} from "@react-types/shared";
+import { TreeState } from "@react-stately/tree";
+import styles from "./Menu.module.css";
+import clsx from "clsx";
+import { useHover } from "@react-aria/interactions";
+import { Item } from "./";
+
+export type SapphireMenuProps<T extends object> = AriaMenuProps<T> &
+    MenuTriggerProps & {
+        isSubMenu: boolean,
+        renderTrigger: (
+            props: ButtonHTMLAttributes<Element>,
+            isOpen: boolean,
+        ) => React.ReactNode;
+    };
+
+interface MenuItemProps<T> {
+    item: Node<T>;
+    state: TreeState<T>;
+    onAction?: (key: Key) => void;
+    onClose: () => void;
+    disabledKeys?: Iterable<Key>;
+    openSubMenu: () => void;
+}
+
+export function MenuItem<T>({
+    item,
+    state,
+    onAction,
+    disabledKeys,
+    onClose,
+    openSubMenu
+}: MenuItemProps<T>): JSX.Element {
+    const ref = React.useRef<HTMLLIElement>(null);
+    const isDisabled = disabledKeys && [...disabledKeys].includes(item.key);
+
+    const { menuItemProps } = useMenuItem(
+        {
+            key: item.key,
+            isDisabled,
+            onAction: item.hasChildNodes ? () => {
+                toggle();
+            } : (e) => {
+                onAction && onAction(e);
+            },
+            onClose: item.hasChildNodes ? () => {
+                toggle();
+            } : () => {
+                onClose && onClose();
+            }
+        },
+        state,
+        ref
+    );
+
+    const { hoverProps, isHovered } = useHover({ isDisabled });
+    const { focusProps, isFocusVisible } = useFocusRing();
+    const { isSelected, toggle } = useToggleState();
+
+    return (
+        <li
+            {...mergeProps(menuItemProps, hoverProps, focusProps)}
+            ref={ref}
+            className={clsx(
+                styles["sapphire-menu-item"],
+                styles["js-focus"],
+                styles["js-hover"],
+                {
+                    [styles["is-disabled"]]: isDisabled,
+                    [styles["is-focus"]]: isFocusVisible,
+                    [styles["is-hover"]]: isHovered
+                }
+            )}
+        >
+            {item.hasChildNodes ?
+                <Menu
+                    renderTrigger={(props, a) => {
+                        // console.log(props, a)
+                        return <p {...props} style={{ width: "100%" }} className={styles["sapphire-menu-item-overflow"]}>{item.rendered}</p>
+                    }}
+                    onAction={alert}
+                    isOpen={isSelected}
+                    // isOpen={isHovered || isFocusVisible}
+                    isSubMenu={true}
+                >
+                    {item.props.children.map((ele: any) => <Item key={ele.props.children}>{ele.props.children}</Item>)}
+                </Menu> :
+                <p className={styles["sapphire-menu-item-overflow"]}>{item.rendered}</p>
+            }
+        </li>
+    );
+
+    // if (item.hasChildNodes) {
+    //     return (
+    //         <Menu
+    //             renderTrigger={(props) => (
+    //                 <li
+    //                     {...mergeProps(menuItemProps, hoverProps, focusProps, props)}
+    //                     // {...props}
+    //                     ref={ref}
+    //                     className={clsx(
+    //                         styles["sapphire-menu-item"],
+    //                         styles["js-focus"],
+    //                         styles["js-hover"],
+    //                         {
+    //                             [styles["is-disabled"]]: isDisabled,
+    //                             [styles["is-focus"]]: isFocusVisible,
+    //                             [styles["is-hover"]]: isHovered
+    //                         }
+    //                     )}
+    //                 >
+    //                     <p className={styles["sapphire-menu-item-overflow"]}>{item.rendered}</p>
+    //                 </li>
+    //             )}
+    //             onAction={alert}
+    //             // isOpen={isHovered || isFocusVisible}
+    //             isSubMenu={true}
+    //         >
+    //             {item.props.children.map((ele: any) => <Item key={ele.props.children}>{ele.props.children}</Item>)}
+    //         </Menu>
+    //     )
+    // }
+
+    // return (
+    //     <li
+    //         {...mergeProps(menuItemProps, hoverProps, focusProps)}
+    //         ref={ref}
+    //         className={clsx(
+    //             styles["sapphire-menu-item"],
+    //             styles["js-focus"],
+    //             styles["js-hover"],
+    //             {
+    //                 [styles["is-disabled"]]: isDisabled,
+    //                 [styles["is-focus"]]: isFocusVisible,
+    //                 [styles["is-hover"]]: isHovered
+    //             }
+    //         )}
+    //     >
+    //         <p className={styles["sapphire-menu-item-overflow"]}>{item.rendered}</p>
+    //     </li>
+    // );
+}
+
+const MenuPopup = <T extends object>(
+    props: {
+        autoFocus: FocusStrategy;
+        // onTestAction: () => void;
+        onClose: () => void;
+        openSubMenu: () => void;
+    } & SapphireMenuProps<T>
+) => {
+    const state = useTreeState({ ...props, selectionMode: "none" });
+    const menuRef = useRef<HTMLUListElement>(null);
+    const { menuProps } = useMenu(props, state, menuRef);
+
+    return (
+        <ul {...menuProps} ref={menuRef} className={styles["sapphire-menu"]}>
+            {[...state.collection].map((item) => {
+                if (item.type === "section") {
+                    throw new Error("Sections not supported");
+                }
+                return (
+                    <MenuItem
+                        key={item.key}
+                        item={item}
+                        state={state}
+                        onClose={props.onClose}
+                        onAction={props.onAction}
+                        disabledKeys={props.disabledKeys}
+                        openSubMenu={props.openSubMenu}
+                    />
+                );
+            })}
+        </ul>
+    );
+};
+
+function _Menu<T extends object>(
+    props: SapphireMenuProps<T>,
+    ref: FocusableRef<HTMLButtonElement>
+) {
+    const { renderTrigger, shouldFlip = true, isSubMenu = false } = props;
+
+    const state = useMenuTriggerState(props);
+    // if (isSubMenu) console.log(state)
+
+    const triggerRef = useFocusableRef<HTMLButtonElement>(ref);
+    const popoverRef = useRef<DOMRefValue<HTMLDivElement>>(null);
+    const unwrappedPopoverRef = useUnwrapDOMRef(popoverRef);
+    const { menuTriggerProps, menuProps } = useMenuTrigger(
+        props,
+        state,
+        triggerRef
+    );
+    const { buttonProps } = useButton(menuTriggerProps, triggerRef);
+
+    const { overlayProps, updatePosition } = useOverlayPosition({
+        targetRef: triggerRef,
+        overlayRef: unwrappedPopoverRef,
+        isOpen: state.isOpen,
+        placement: isSubMenu ? "right top" : "bottom start",
+        offset: 6,
+        onClose: state.close,
+        shouldFlip
+    });
+
+    // Fixes an issue where menu with controlled open state opens in wrong place the first time
+    useLayoutEffect(() => {
+        if (state.isOpen) {
+            requestAnimationFrame(() => {
+                updatePosition();
+            });
+        }
+    }, [state.isOpen, updatePosition]);
+
+    return (
+        <>
+            {renderTrigger({ ref: triggerRef, ...buttonProps }, state.isOpen)}
+            <Popover
+                isOpen={state.isOpen}
+                ref={popoverRef}
+                style={overlayProps.style}
+                className={clsx(styles["sapphire-menu-container"])}
+                shouldCloseOnBlur
+                onClose={state.close}
+            >
+                <FocusScope>
+                    <MenuPopup
+                        {...mergeProps(props, menuProps)}
+                        // onTestAction={isSubMenu ? state.open : props.onAction}
+                        autoFocus={state.focusStrategy || true}
+                        onClose={state.close}
+                        openSubMenu={() => {
+                            console.log("aaaa")
+                            state.toggle()
+                        }}
+                    />
+                </FocusScope>
+            </Popover>
+        </>
+    );
+}
+
+export const Menu = React.forwardRef(_Menu) as <T extends object>(
+    props: SapphireMenuProps<T>,
+    ref: FocusableRef<HTMLButtonElement>
+) => ReactElement;

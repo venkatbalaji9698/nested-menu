@@ -3,6 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@react-aria/button": "3.6.4",
+    "@react-aria/menu": "3.7.1",
+    "@react-spectrum/utils": "3.8.1",
+    "@react-stately/collections": "3.5.1",
+    "@react-stately/menu": "3.4.4",
+    "@react-stately/toggle": "^3.4.4",
+    "@react-stately/tree": "3.4.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",

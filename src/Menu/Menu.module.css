@@ -1,0 +1,140 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@600&display=swap");
+.sapphire-menu-container {
+  --sapphire-menu-font-weight: 600;
+  --sapphire-menu-size-spacing-horizontal-right: 45px;
+  --sapphire-menu-size-spacing-horizontal-left: 12px;
+  --sapphire-menu-size-height-item: 42px;
+  --sapphire-menu-size-width-max: 420px;
+  --sapphire-menu-size-font: 16px;
+  --sapphire-menu-time-transition: 0.1s;
+  --sapphire-menu-opacity-disabled: 0.4;
+  --sapphire-menu-color-shadow: hsla(202, 12%, 56%, 0.2);
+  --sapphire-menu-color-border-focus: hsl(203, 100%, 39%);
+  --sapphire-menu-color-separator: hsl(202, 12%, 87%);
+  --sapphire-menu-color-content-default: hsl(202, 100%, 11%);
+  --sapphire-menu-font-name: "Nunito", sans-serif;
+  --sapphire-menu-size-shadow-blur-radius: 10px;
+  --sapphire-menu-size-shadow-y-offset: 5px;
+  --sapphire-menu-size-shadow-x-offset: 0;
+  --sapphire-menu-size-line-height: 1.5;
+  --sapphire-menu-size-radius: 6px;
+  --sapphire-menu-size-height-separator: 1px;
+  --sapphire-menu-size-width-border: 1px;
+  --sapphire-menu-color-background-focus: hsl(0, 0%, 100%);
+  --sapphire-menu-color-background-hover: hsl(195, 33%, 98%);
+  --sapphire-menu-color-background-default: hsl(0, 0%, 100%);
+  --sapphire-menu-color-border-default: hsl(202, 12%, 87%);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.sapphire-menu-container {
+  background-color: var(--sapphire-menu-color-background-default);
+  box-shadow: var(--sapphire-menu-size-shadow-x-offset)
+    var(--sapphire-menu-size-shadow-y-offset)
+    var(--sapphire-menu-size-shadow-blur-radius) 0
+    var(--sapphire-menu-color-shadow);
+  animation: fade-in var(--sapphire-menu-time-transition) ease-in-out;
+  box-sizing: border-box;
+  border-width: var(--sapphire-menu-size-width-border);
+  border-style: solid;
+  border-color: var(--sapphire-menu-color-border-default);
+  border-radius: var(--sapphire-menu-size-radius);
+  /* overflow: hidden; */
+}
+
+.sapphire-menu {
+  max-width: var(--sapphire-menu-size-width-max);
+  margin: 0;
+  padding: 0;
+  position: relative;
+  list-style: none;
+  outline: none;
+}
+
+.sapphire-menu-item {
+  height: var(--sapphire-menu-size-height-item);
+  display: flex;
+  align-items: center;
+  color: var(--sapphire-menu-color-content-default);
+  font-family: var(--sapphire-menu-font-name);
+  font-weight: var(--sapphire-menu-font-weight);
+  font-size: var(--sapphire-menu-size-font);
+  /* The below is meant to address a font rendering quirk in OSX where the text
+   * looks bolder than intended due to subpixel rendering. This quirk generally
+   * occurs for bold fonts on dark backgrounds but depending on the font, it
+   * can happen in other contexts as well.
+   *
+   * These do not do anything except in webkit browsers & firefox on OSX.
+   *
+   * For more details see:
+   * - https://azuredevops/Main/WCCJ/_git/sapphire/pullRequest/212710?path=%2Fpackages%2Fcss%2Fcomponents%2Fbutton%2Fbutton.module.css&discussionId=1507702&_a=files
+   * - https://usabilitypost.com/2012/11/05/stop-fixing-font-smoothing/
+   */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  outline: none;
+  cursor: pointer;
+  line-height: var(--sapphire-menu-size-line-height);
+}
+
+.sapphire-menu-item-overflow {
+  padding-left: var(--sapphire-menu-size-spacing-horizontal-left);
+  padding-right: var(--sapphire-menu-size-spacing-horizontal-right);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0;
+}
+
+.sapphire-menu-item.is-danger {
+  color: var(--sapphire-menu-color-content-danger);
+}
+.sapphire-menu-item.is-disabled {
+  opacity: var(--sapphire-menu-opacity-disabled);
+  cursor: default;
+}
+
+.sapphire-menu-section {
+  padding: 0;
+  list-style: none;
+}
+.sapphire-menu-separator {
+  max-width: var(--sapphire-menu-size-width-max);
+  background: var(--sapphire-menu-color-separator);
+  width: 100%;
+  height: var(--sapphire-menu-size-height-separator);
+}
+
+.sapphire-menu-item:not(.is-disabled).is-focus,
+.sapphire-menu-item:not(.is-disabled):not(.js-focus):focus-visible {
+  background-color: var(--sapphire-menu-color-background-focus);
+  outline: none;
+  box-shadow: inset 0px 0px 0px var(--sapphire-menu-size-width-border)
+    var(--sapphire-menu-color-border-focus);
+}
+.sapphire-menu > li:first-of-type li:first-of-type {
+  border-top-left-radius: var(--sapphire-menu-size-radius);
+  border-top-right-radius: var(--sapphire-menu-size-radius);
+}
+.sapphire-menu > li:last-of-type li:last-of-type {
+  border-bottom-left-radius: var(--sapphire-menu-size-radius);
+  border-bottom-right-radius: var(--sapphire-menu-size-radius);
+}
+
+.sapphire-menu-item:not(.is-disabled).is-hover,
+.sapphire-menu-item:not(.is-disabled):not(.js-hover):hover {
+  background-color: var(--sapphire-menu-color-background-hover);
+  border-color: var(--sapphire-menu-color-background-hover);
+  outline: none;
+}
