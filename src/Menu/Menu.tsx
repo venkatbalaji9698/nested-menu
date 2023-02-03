@@ -118,16 +118,19 @@ export function MenuItem<T>({
                 }
             )}
             id={String(item.key)}
-            // onBlur={() => setSelected(false)}
         >
             {item.hasChildNodes ?
                 <Menu
                     renderTrigger={(props, a) => {
-                        return <p {...props} style={{ width: "100%" }} className={styles["sapphire-menu-item-overflow"]}>{item.rendered}</p>
+                        return (
+                            <p {...props} style={{ width: "100%" }} className={styles["sapphire-menu-item-overflow"]}>
+                                {item.rendered}
+                                <span style={{ float: "right" }}>-&gt;</span>
+                            </p>
+                        )
                     }}
                     onAction={alert}
                     isOpen={isSelected}
-                    // isOpen={isHovered || isFocusVisible}
                     isSubMenu={true}
                     setSelectedParentMenu={setSelected}
                     parentId={String(item.key)}

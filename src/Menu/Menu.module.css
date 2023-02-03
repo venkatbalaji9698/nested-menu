@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@600&display=swap");
 .sapphire-menu-container {
   --sapphire-menu-font-weight: 600;
-  --sapphire-menu-size-spacing-horizontal-right: 45px;
+  --sapphire-menu-size-spacing-horizontal-right: 30px;
   --sapphire-menu-size-spacing-horizontal-left: 12px;
   --sapphire-menu-size-height-item: 42px;
   --sapphire-menu-size-width-max: 420px;
