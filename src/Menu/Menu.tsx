@@ -1,12 +1,9 @@
-/* tslint:disable */
-
 import React, {
     ButtonHTMLAttributes,
     Key,
     ReactElement,
     useLayoutEffect,
     useRef,
-    useEffect
 } from "react";
 import { AriaMenuProps, MenuTriggerProps } from "@react-types/menu";
 import { useMenuTriggerState } from "@react-stately/menu";
@@ -34,7 +31,7 @@ import { Item } from "./";
 export type SapphireMenuProps<T extends object> = AriaMenuProps<T> &
     MenuTriggerProps & {
         isSubMenu: boolean,
-        setSelectedParentMenu: (val) => void,
+        setSelectedParentMenu: (val: boolean) => void,
         parentId: string,
         renderTrigger: (
             props: ButtonHTMLAttributes<Element>,
@@ -49,7 +46,7 @@ interface MenuItemProps<T> {
     onClose: () => void;
     disabledKeys?: Iterable<Key>;
     isSubMenu: boolean,
-    setSelectedParentMenu: (e) => void,
+    setSelectedParentMenu: (val: boolean) => void,
     parentId: string
 }
 
@@ -155,7 +152,7 @@ const MenuPopup = <T extends object>(
         autoFocus: FocusStrategy;
         onClose: () => void;
         isSubMenu: boolean,
-        setSelectedParentMenu: (val) => void,
+        setSelectedParentMenu: (val: boolean) => void,
         parentId: string
     } & SapphireMenuProps<T>
 ) => {
@@ -232,7 +229,10 @@ function _Menu<T extends object>(
                 style={overlayProps.style}
                 className={clsx(styles["sapphire-menu-container"])}
                 shouldCloseOnBlur
-                onClose={state.close}
+                onClose={() => {
+                    if (isSubMenu) setSelectedParentMenu(false)
+                    state.close()
+                }}
             >
                 <FocusScope>
                     <MenuPopup

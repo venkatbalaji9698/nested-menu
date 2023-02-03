@@ -12,7 +12,6 @@ root.render(
     <Menu
       renderTrigger={(props) => <button {...props}>Actions</button>}
       onAction={alert}
-      // isOpen
     >
       <Item key="copy">Copy application</Item>
       <Item key="rename">Rename application</Item>
