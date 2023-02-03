@@ -86,20 +86,13 @@ export function MenuItem<T>({
     const { isSelected, setSelected } = useToggleState();
     const { keyboardProps } = useKeyboard({
         onKeyUp: (e) => {
-            if (item.hasChildNodes && e.keyCode === 39) {
+            if (item.hasChildNodes && (e.keyCode === 39 || e.keyCode === 13)) {
                 setSelected(true);
                 setTimeout(() => {
                     const ele = document.getElementById(item.props.children[0].props.children)
                     ele?.focus()
                     if (ref && ref.current) {
                         ref.current.blur();
-                    }
-                }, 0)
-            } else if (item.hasChildNodes) {
-                setSelected(true);
-                setTimeout(() => {
-                    if (ref && ref.current) {
-                        ref.current.focus();
                     }
                 }, 0)
             } else if (isSubMenu && e.keyCode === 37) {
